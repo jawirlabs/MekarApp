@@ -36,6 +36,8 @@ dependencies:
   cupertino_icons: ^1.0.8
   webview_flutter: ^4.4.2
   flutter_launcher_icons: ^0.13.1
+  intl: ^0.20.2
+  flutter_inappwebview: ^6.1.5
 
 flutter_icons:
   android: true
@@ -65,6 +67,8 @@ flutter:
   uses-material-design: true
   assets:
     - assets/welcome.png
+    - assets/developer.png
+    - assets/mekarjs.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:
