@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mekarjs/core/theme/colors.dart';
 import 'package:mekarjs/features/chat/presentation/pages/chat_page.dart';
-import 'package:mekarjs/features/customer/presentation/pages/customer_page.dart';
+// import 'package:mekarjs/features/customer/presentation/pages/customer_page.dart';
 import 'package:mekarjs/features/employee/presentation/pages/employee_page.dart';
-import 'package:mekarjs/features/home/presentation/pages/home_page.dart';
+// import 'package:mekarjs/features/home/presentation/pages/home_page.dart';
 import 'package:mekarjs/features/inventory/presentation/pages/inventory_page.dart';
 import 'package:mekarjs/features/product/presentation/pages/product_page.dart';
 import 'package:mekarjs/features/production/presentation/pages/production_page.dart';
 import 'package:mekarjs/features/purchase/presentation/pages/purchase_page.dart';
 import 'package:mekarjs/features/sales/presentation/pages/sales_page.dart';
-import 'package:mekarjs/features/supplier/presentation/pages/supplier_page.dart';
+// import 'package:mekarjs/features/supplier/presentation/pages/supplier_page.dart';
 import 'package:mekarjs/features/website/presentation/pages/website_page.dart';
 import 'package:mekarjs/features/profile/presentation/pages/profile_page.dart';
 
@@ -28,9 +28,9 @@ class _NavbarPageState extends State<NavbarPage> {
     // HomePage(),
     ChatPage(),
     SalesPage(),
-    CustomerPage(),
+    // CustomerPage(),
     PurchasePage(),
-    SupplierPage(),
+    // SupplierPage(),
     InventoryPage(),
     ProductPage(),
     EmployeePage(),
@@ -43,9 +43,9 @@ class _NavbarPageState extends State<NavbarPage> {
     // {'icon': Icons.home_outlined, 'label': 'Home'},
     {'icon': Icons.auto_awesome, 'label': 'Tanya AI'},
     {'icon': Icons.point_of_sale_outlined, 'label': 'Sales'},
-    {'icon': Icons.group_outlined, 'label': 'Customer'},
+    // {'icon': Icons.group_outlined, 'label': 'Customer'},
     {'icon': Icons.shopping_cart_outlined, 'label': 'Purchase'},
-    {'icon': Icons.local_shipping_outlined, 'label': 'Supplier'},
+    // {'icon': Icons.local_shipping_outlined, 'label': 'Supplier'},
     {'icon': Icons.inventory_2_outlined, 'label': 'Inventory'},
     {'icon': Icons.inventory_outlined, 'label': 'Product'},
     {'icon': Icons.people_outline, 'label': 'Employee'},

@@ -1,7 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:mekarjs/features/home/presentation/pages/navbar_page.dart';
+import 'package:mekarjs/features/auth/presentation/pages/login_page.dart';
+// import 'package:mekarjs/features/home/presentation/pages/navbar_page.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
@@ -156,7 +157,7 @@ class _WelcomePageState extends State<WelcomePage> {
                 onPressed: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const NavbarPage()),
+                    MaterialPageRoute(builder: (context) => const LoginPage()),
                   );
                 },
                 child: const Text('Get Started'),

@@ -38,6 +38,10 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
   intl: ^0.20.2
   flutter_inappwebview: ^6.1.5
+  dio: ^5.8.0+1
+  http: ^1.4.0
+  shared_preferences: ^2.5.3
+  flutter_svg: ^2.1.0
 
 flutter_icons:
   android: true
@@ -69,6 +73,7 @@ flutter:
     - assets/welcome.png
     - assets/developer.png
     - assets/mekarjs.png
+    - assets/logo.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

@@ -7,9 +7,9 @@ import 'package:mekarjs/features/home/presentation/pages/navbar_page.dart';
 import 'package:mekarjs/features/home/presentation/pages/home_page.dart';
 import 'package:mekarjs/features/chat/presentation/pages/chat_page.dart';
 import 'package:mekarjs/features/sales/presentation/pages/sales_page.dart';
-import 'package:mekarjs/features/customer/presentation/pages/customer_page.dart';
+// import 'package:mekarjs/features/customer/presentation/pages/customer_page.dart';
 import 'package:mekarjs/features/purchase/presentation/pages/purchase_page.dart';
-import 'package:mekarjs/features/supplier/presentation/pages/supplier_page.dart';
+// import 'package:mekarjs/features/supplier/presentation/pages/supplier_page.dart';
 import 'package:mekarjs/features/inventory/presentation/pages/inventory_page.dart';
 import 'package:mekarjs/features/employee/presentation/pages/employee_page.dart';
 import 'package:mekarjs/features/production/presentation/pages/production_page.dart';
@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
       title: 'MekarJS',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      initialRoute: '/main',
+      initialRoute: '/login',
       routes: {
         '/': (context) => const WelcomePage(),
         '/login': (context) => const LoginPage(),
@@ -39,9 +39,9 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const HomePage(),
         '/chat': (context) => const ChatPage(),
         '/sales': (context) => const SalesPage(),
-        '/customer': (context) => const CustomerPage(),
+        // '/customer': (context) => const CustomerPage(),
         '/purchase': (context) => const PurchasePage(),
-        '/supplier': (context) => const SupplierPage(),
+        // '/supplier': (context) => const SupplierPage(),
         '/inventory': (context) => const InventoryPage(),
         '/employee': (context) => const EmployeePage(),
         '/production': (context) => const ProductionPage(),
