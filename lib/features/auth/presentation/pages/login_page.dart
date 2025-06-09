@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // Tambahkan ini untuk SystemChrome
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mekarjs/core/theme/colors.dart';
@@ -16,6 +17,18 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
   bool _obscurePassword = true;
+
+  @override
+  void initState() {
+    super.initState();
+    // Set warna status bar
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarColor: AppColors.primary, // Gunakan warna yang sama dengan AppBar
+        statusBarIconBrightness: Brightness.light, // Sesuaikan dengan warna background
+      ),
+    );
+  }
 
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
@@ -60,6 +73,11 @@ class _LoginPageState extends State<LoginPage> {
     final borderColor = Colors.black.withOpacity(0.15);
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: AppColors.background, // Warna yang sama dengan status bar
+        elevation: 0, // Hilangkan shadow jika perlu
+        toolbarHeight: 0, // Sembunyikan AppBar jika hanya ingin warna status bar
+      ),
       backgroundColor: AppColors.background,
       body: Center(
         child: SingleChildScrollView(
@@ -223,15 +241,11 @@ class _LoginPageState extends State<LoginPage> {
                       // Login Button
                       SizedBox(
                         width: double.infinity,
-                        height: 64,
+                        height: 50,
                         child: ElevatedButton(
                           onPressed: _isLoading ? null : _login,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
-                            // shape: RoundedRectangleBorder(
-                            //   borderRadius: BorderRadius.circular(100),
-                            //   side: BorderSide(color: borderColor),
-                            // ),
                           ),
                           child: _isLoading
                               ? const SizedBox(
