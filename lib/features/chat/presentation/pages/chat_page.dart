@@ -14,7 +14,7 @@ class _ChatPageState extends State<ChatPage> {
     return Scaffold(
       body: InAppWebView(
         initialUrlRequest: URLRequest(
-          url: WebUri("https://jawirai.vercel.app"), // Use WebUri instead of Uri.parse
+          url: WebUri("https://mekarai.vercel.app"), // Use WebUri instead of Uri.parse
         ),
       ),
     );
