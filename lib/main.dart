@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
       title: 'MekarJS',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      initialRoute: '/main',
+      initialRoute: '/login',
       routes: {
         '/': (context) => const WelcomePage(),
         '/login': (context) => const LoginPage(),
