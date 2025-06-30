@@ -3,35 +3,35 @@ import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 import 'package:mekarjs/core/theme/colors.dart';
 
-class PurchasePage extends StatefulWidget {
-  const PurchasePage({super.key});
+class SalesScreen extends StatefulWidget {
+  const SalesScreen({super.key});
 
   @override
-  State<PurchasePage> createState() => _PurchasePageState();
+  State<SalesScreen> createState() => _SalesScreenState();
 }
 
-class _PurchasePageState extends State<PurchasePage> {
+class _SalesScreenState extends State<SalesScreen> {
   final Dio _dio = Dio();
-  List<dynamic> purchases = [];
-  List<dynamic> filteredPurchases = [];
+  List<dynamic> sales = [];
+  List<dynamic> filteredSales = [];
   bool isLoading = true;
   String? selectedBranch;
   String? selectedPaymentMethod;
   String searchQuery = '';
-  final double _borderRadius = 12.0; // Increased border radius value
+  final double _borderRadius = 12.0;
 
   @override
   void initState() {
     super.initState();
-    _fetchPurchases();
+    _fetchSales();
   }
 
-  Future<void> _fetchPurchases() async {
+  Future<void> _fetchSales() async {
     try {
-      final response = await _dio.get('https://mekarjs-api.vercel.app/api/purchase');
+      final response = await _dio.get('https://mekarjs-api.vercel.app/api/sale');
       setState(() {
-        purchases = response.data;
-        filteredPurchases = purchases;
+        sales = response.data;
+        filteredSales = sales;
         isLoading = false;
       });
     } catch (e) {
@@ -40,7 +40,7 @@ class _PurchasePageState extends State<PurchasePage> {
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error fetching purchases: $e'),
+          content: Text('Error fetching sales: $e'),
           backgroundColor: AppColors.danger,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -53,14 +53,14 @@ class _PurchasePageState extends State<PurchasePage> {
 
   void _applyFilters() {
     setState(() {
-      filteredPurchases = purchases.where((purchase) {
+      filteredSales = sales.where((sale) {
         final branchMatch = selectedBranch == null || 
-            purchase['branch'].toLowerCase() == selectedBranch!.toLowerCase();
+            sale['branch'].toLowerCase() == selectedBranch!.toLowerCase();
         final paymentMatch = selectedPaymentMethod == null || 
-            purchase['paymentMethod'] == selectedPaymentMethod;
+            sale['paymentMethod'] == selectedPaymentMethod;
         final searchMatch = searchQuery.isEmpty ||
-            purchase['supplier']['name'].toLowerCase().contains(searchQuery.toLowerCase()) ||
-            purchase['products'].any((product) => 
+            sale['customer']['name'].toLowerCase().contains(searchQuery.toLowerCase()) ||
+            sale['products'].any((product) => 
                 product['productName'].toLowerCase().contains(searchQuery.toLowerCase()));
         return branchMatch && paymentMatch && searchMatch;
       }).toList();
@@ -75,6 +75,7 @@ class _PurchasePageState extends State<PurchasePage> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
+                const SizedBox(height: 32),
                 Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: Column(
@@ -86,7 +87,7 @@ class _PurchasePageState extends State<PurchasePage> {
                         ),
                         child: TextField(
                           decoration: InputDecoration(
-                            labelText: 'Search supplier or product',
+                            labelText: 'Search customer or product',
                             labelStyle: const TextStyle(color: AppColors.textSecondary),
                             prefixIcon: const Icon(Icons.search, color: AppColors.textSecondary),
                             border: InputBorder.none,
@@ -192,10 +193,10 @@ class _PurchasePageState extends State<PurchasePage> {
                   ),
                 ),
                 Expanded(
-                  child: filteredPurchases.isEmpty
+                  child: filteredSales.isEmpty
                       ? Center(
                           child: Text(
-                            'No purchases found',
+                            'No sales found',
                             style: TextStyle(
                               color: AppColors.textSecondary,
                               fontSize: 16,
@@ -204,10 +205,10 @@ class _PurchasePageState extends State<PurchasePage> {
                         )
                       : ListView.builder(
                           padding: const EdgeInsets.only(bottom: 16),
-                          itemCount: filteredPurchases.length,
+                          itemCount: filteredSales.length,
                           itemBuilder: (context, index) {
-                            final purchase = filteredPurchases[index];
-                            return _buildPurchaseCard(purchase);
+                            final sale = filteredSales[index];
+                            return _buildSaleCard(sale);
                           },
                         ),
                 ),
@@ -216,23 +217,23 @@ class _PurchasePageState extends State<PurchasePage> {
     );
   }
 
-  Widget _buildPurchaseCard(Map<String, dynamic> purchase) {
+  Widget _buildSaleCard(Map<String, dynamic> sale) {
     final dateFormat = DateFormat('dd MMM yyyy, HH:mm');
-    final createdAt = DateTime.parse(purchase['createdAt']).toLocal();
+    final createdAt = DateTime.parse(sale['createdAt']).toLocal();
     
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: AppColors.background,
         border: Border.all(color: Colors.black.withOpacity(0.15)),
-        borderRadius: BorderRadius.circular(_borderRadius * 1.5), // Even more rounded for cards
-        // boxShadow: [
-        //   BoxShadow(
-        //     color: Colors.black.withOpacity(0.05),
-        //     blurRadius: 8,
-        //     offset: const Offset(0, 4),
-        //   ),
-        // ],
+        borderRadius: BorderRadius.circular(_borderRadius * 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -243,7 +244,7 @@ class _PurchasePageState extends State<PurchasePage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  purchase['supplier']['name'],
+                  sale['customer']['name'],
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -255,10 +256,10 @@ class _PurchasePageState extends State<PurchasePage> {
                   decoration: BoxDecoration(
                     color: AppColors.secondary,
                     // border: Border.all(color: Colors.black.withOpacity(0.15)),
-                    borderRadius: BorderRadius.circular(20), // More rounded for badges
+                    borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    purchase['branch'],
+                    sale['branch'],
                     style: const TextStyle(
                       color: AppColors.textPrimary,
                       fontWeight: FontWeight.w500,
@@ -269,11 +270,11 @@ class _PurchasePageState extends State<PurchasePage> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Address: ${purchase['supplier']['address']}',
+              'Address: ${sale['customer']['address']}',
               style: const TextStyle(color: AppColors.textSecondary),
             ),
             Text(
-              'Contact: ${purchase['supplier']['contact']}',
+              'Contact: ${sale['customer']['contact']}',
               style: const TextStyle(color: AppColors.textSecondary),
             ),
             const SizedBox(height: 12),
@@ -285,7 +286,7 @@ class _PurchasePageState extends State<PurchasePage> {
               ),
             ),
             const SizedBox(height: 4),
-            ...purchase['products'].map<Widget>((product) {
+            ...sale['products'].map<Widget>((product) {
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 6.0),
                 child: Row(
@@ -307,14 +308,14 @@ class _PurchasePageState extends State<PurchasePage> {
                     Expanded(
                       flex: 2,
                       child: Text(
-                        'Rp${NumberFormat('#,###').format(product['unitPrice'])}',
+                        'Rp${NumberFormat('#,###').format(product['sellingPrice'])}',
                         style: const TextStyle(color: AppColors.textPrimary),
                       ),
                     ),
                     Expanded(
                       flex: 2,
                       child: Text(
-                        'Rp${NumberFormat('#,###').format(product['quantity'] * product['unitPrice'])}',
+                        'Rp${NumberFormat('#,###').format(product['quantity'] * product['sellingPrice'])}',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
@@ -336,12 +337,12 @@ class _PurchasePageState extends State<PurchasePage> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: _getPaymentMethodColor(purchase['paymentMethod']),
+                    color: _getPaymentMethodColor(sale['paymentMethod']),
                     // border: Border.all(color: Colors.black.withOpacity(0.15)),
-                    borderRadius: BorderRadius.circular(20), // More rounded for payment method badge
+                    borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    purchase['paymentMethod'].toUpperCase(),
+                    sale['paymentMethod'].toUpperCase(),
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -349,7 +350,7 @@ class _PurchasePageState extends State<PurchasePage> {
                   ),
                 ),
                 Text(
-                  'Total: Rp${NumberFormat('#,###').format(purchase['totalAmount'])}',
+                  'Total: Rp${NumberFormat('#,###').format(sale['totalAmount'])}',
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,

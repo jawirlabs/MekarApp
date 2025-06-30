@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:mekarjs/features/auth/presentation/pages/login_page.dart';
-import 'package:mekarjs/features/auth/presentation/pages/register_page.dart';
-import 'package:mekarjs/features/product/presentation/pages/product_page.dart';
-import 'package:mekarjs/features/welcome/presentation/pages/welcome_page.dart';
-import 'package:mekarjs/features/home/presentation/pages/navbar_page.dart';
-import 'package:mekarjs/features/home/presentation/pages/home_page.dart';
-import 'package:mekarjs/features/chat/presentation/pages/chat_page.dart';
-import 'package:mekarjs/features/sales/presentation/pages/sales_page.dart';
-// import 'package:mekarjs/features/customer/presentation/pages/customer_page.dart';
-import 'package:mekarjs/features/purchase/presentation/pages/purchase_page.dart';
-// import 'package:mekarjs/features/supplier/presentation/pages/supplier_page.dart';
-import 'package:mekarjs/features/inventory/presentation/pages/inventory_page.dart';
-import 'package:mekarjs/features/employee/presentation/pages/employee_page.dart';
-import 'package:mekarjs/features/production/presentation/pages/production_page.dart';
-import 'package:mekarjs/features/website/presentation/pages/website_page.dart';
-import 'package:mekarjs/features/profile/presentation/pages/profile_page.dart';
+import 'package:mekarjs/screens/login_screen.dart';
+import 'package:mekarjs/screens/product_screen.dart';
+import 'package:mekarjs/screens/navbar_screen.dart';
+import 'package:mekarjs/screens/home_screen.dart';
+import 'package:mekarjs/screens/chat_screen.dart';
+import 'package:mekarjs/screens/sales_screen.dart';
+import 'package:mekarjs/screens/purchase_screen.dart';
+import 'package:mekarjs/screens/inventory_screen.dart';
+import 'package:mekarjs/screens/employee_screen.dart';
+import 'package:mekarjs/screens/production_screen.dart';
+import 'package:mekarjs/screens/profile_screen.dart';
 import 'package:mekarjs/core/theme/app_theme.dart';
 
 void main() {
@@ -32,22 +27,17 @@ class MyApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       initialRoute: '/login',
       routes: {
-        '/': (context) => const WelcomePage(),
-        '/login': (context) => const LoginPage(),
-        '/register': (context) => const RegisterPage(),
+        '/login': (context) => const LoginScreen(),
         '/main': (context) => NavbarPage(),
-        '/home': (context) => const HomePage(),
-        '/chat': (context) => const ChatPage(),
-        '/sales': (context) => const SalesPage(),
-        // '/customer': (context) => const CustomerPage(),
-        '/purchase': (context) => const PurchasePage(),
-        // '/supplier': (context) => const SupplierPage(),
-        '/inventory': (context) => const InventoryPage(),
-        '/employee': (context) => const EmployeePage(),
-        '/production': (context) => const ProductionPage(),
-        '/product': (context) => const ProductPage(),
-        '/website': (context) => const WebsitePage(),
-        '/profile': (context) => const ProfilePage(),
+        '/home': (context) => const HomeScreen(),
+        '/chat': (context) => const ChatScreen(),
+        '/sales': (context) => const SalesScreen(),
+        '/purchase': (context) => const PurchaseScreen(),
+        '/inventory': (context) => const InventoryScreen(),
+        '/employee': (context) => const EmployeeScreen(),
+        '/production': (context) => const ProductionScreen(),
+        '/product': (context) => const ProductScreen(),
+        '/profile': (context) => const ProfileScreen(),
       },
     );
   }

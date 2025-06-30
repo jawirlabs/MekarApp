@@ -3,37 +3,36 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mekarjs/core/theme/colors.dart';
 
-class ProductionPage extends StatefulWidget {
-  const ProductionPage({super.key});
+class ProductScreen extends StatefulWidget {
+  const ProductScreen({super.key});
 
   @override
-  State<ProductionPage> createState() => _ProductionPageState();
+  State<ProductScreen> createState() => _ProductScreenState();
 }
 
-class _ProductionPageState extends State<ProductionPage> {
+class _ProductScreenState extends State<ProductScreen> {
   final Dio _dio = Dio();
-  final String _apiUrl = 'https://mekarjs-api.vercel.app/api/production';
+  final String _apiUrl = 'https://mekarjs-api.vercel.app/api/product';
   
-  List<ProductionRecord> _productionRecords = [];
-  List<ProductionRecord> _filteredRecords = [];
+  List<Product> _products = [];
+  List<Product> _filteredProducts = [];
   bool _isLoading = true;
   String? _errorMessage;
 
   // Filter controllers
   final TextEditingController _searchController = TextEditingController();
-  String? _selectedStatus;
+  final TextEditingController _minPriceController = TextEditingController();
+  final TextEditingController _maxPriceController = TextEditingController();
   final TextEditingController _minQuantityController = TextEditingController();
   final TextEditingController _maxQuantityController = TextEditingController();
-  final TextEditingController _minValueController = TextEditingController();
-  final TextEditingController _maxValueController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _fetchProductionRecords();
+    _fetchProducts();
   }
 
-  Future<void> _fetchProductionRecords() async {
+  Future<void> _fetchProducts() async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -44,19 +43,19 @@ class _ProductionPageState extends State<ProductionPage> {
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
         setState(() {
-          _productionRecords = data.map((item) => ProductionRecord.fromJson(item)).toList();
-          _filteredRecords = List.from(_productionRecords);
+          _products = data.map((item) => Product.fromJson(item)).toList();
+          _filteredProducts = List.from(_products);
           _isLoading = false;
         });
       } else {
         setState(() {
-          _errorMessage = 'Failed to load production records: ${response.statusCode}';
+          _errorMessage = 'Failed to load products: ${response.statusCode}';
           _isLoading = false;
         });
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Error fetching production records: ${e.toString()}';
+        _errorMessage = 'Error fetching products: ${e.toString()}';
         _isLoading = false;
       });
     }
@@ -64,29 +63,23 @@ class _ProductionPageState extends State<ProductionPage> {
 
   void _applyFilters() {
     setState(() {
-      _filteredRecords = _productionRecords.where((record) {
+      _filteredProducts = _products.where((product) {
         // Search filter
         final matchesSearch = _searchController.text.isEmpty ||
-            record.product.toLowerCase().contains(_searchController.text.toLowerCase()) ||
-            record.operator.toLowerCase().contains(_searchController.text.toLowerCase());
+            product.productName.toLowerCase().contains(_searchController.text.toLowerCase()) ||
+            product.sku.toLowerCase().contains(_searchController.text.toLowerCase());
 
-        // Status filter
-        final matchesStatus = _selectedStatus == null || 
-            record.status == _selectedStatus;
+        // Price range filter
+        final minPrice = int.tryParse(_minPriceController.text) ?? 0;
+        final maxPrice = int.tryParse(_maxPriceController.text) ?? double.maxFinite.toInt();
+        final matchesPrice = product.unitPrice >= minPrice && product.unitPrice <= maxPrice;
 
         // Quantity range filter
         final minQuantity = int.tryParse(_minQuantityController.text) ?? 0;
         final maxQuantity = int.tryParse(_maxQuantityController.text) ?? double.maxFinite.toInt();
-        final matchesQuantity = record.quantityProduced >= minQuantity && 
-            record.quantityProduced <= maxQuantity;
+        final matchesQuantity = product.quantity >= minQuantity && product.quantity <= maxQuantity;
 
-        // Value range filter
-        final minValue = int.tryParse(_minValueController.text) ?? 0;
-        final maxValue = int.tryParse(_maxValueController.text) ?? double.maxFinite.toInt();
-        final matchesValue = record.saleValue >= minValue && 
-            record.saleValue <= maxValue;
-
-        return matchesSearch && matchesStatus && matchesQuantity && matchesValue;
+        return matchesSearch && matchesPrice && matchesQuantity;
       }).toList();
     });
   }
@@ -94,12 +87,11 @@ class _ProductionPageState extends State<ProductionPage> {
   void _resetFilters() {
     setState(() {
       _searchController.clear();
-      _selectedStatus = null;
+      _minPriceController.clear();
+      _maxPriceController.clear();
       _minQuantityController.clear();
       _maxQuantityController.clear();
-      _minValueController.clear();
-      _maxValueController.clear();
-      _filteredRecords = List.from(_productionRecords);
+      _filteredProducts = List.from(_products);
     });
   }
 
@@ -108,15 +100,16 @@ class _ProductionPageState extends State<ProductionPage> {
     return Scaffold(
       body: Column(
         children: [
+          const SizedBox(height: 32),
           _buildFilterSection(),
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _errorMessage != null
                     ? Center(child: Text(_errorMessage!))
-                    : _filteredRecords.isEmpty
-                        ? const Center(child: Text('No production records found'))
-                        : _buildProductionList(),
+                    : _filteredProducts.isEmpty
+                        ? const Center(child: Text('No products found'))
+                        : _buildProductList(),
           ),
         ],
       ),
@@ -124,8 +117,6 @@ class _ProductionPageState extends State<ProductionPage> {
   }
 
   Widget _buildFilterSection() {
-    final statuses = _productionRecords.map((e) => e.status).toSet().toList();
-
     return Container(
       margin: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -140,7 +131,7 @@ class _ProductionPageState extends State<ProductionPage> {
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                labelText: 'Search by product or operator',
+                labelText: 'Search by name or SKU',
                 prefixIcon: const Icon(Icons.search, color: AppColors.textSecondary),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.clear, color: AppColors.textSecondary),
@@ -169,71 +160,63 @@ class _ProductionPageState extends State<ProductionPage> {
             ),
             const SizedBox(height: 12),
 
-            // Status and quantity filters
+            // Price range filter
             Row(
               children: [
                 Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.black.withOpacity(0.15)),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        isExpanded: true,
-                        value: _selectedStatus,
-                        hint: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Text(
-                            'All Statuses',
-                            style: TextStyle(color: AppColors.textSecondary),
-                          ),
-                        ),
-                        items: [
-                          DropdownMenuItem(
-                            value: null,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: Text(
-                                'All Statuses',
-                                style: TextStyle(color: AppColors.textPrimary),
-                              ),
-                            ),
-                          ),
-                          ...statuses.map((status) {
-                            return DropdownMenuItem(
-                              value: status,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16),
-                                child: Text(
-                                  status,
-                                  style: TextStyle(
-                                    color: _getStatusColor(status),
-                                  ),
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ],
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedStatus = value;
-                          });
-                          _applyFilters();
-                        },
-                        dropdownColor: AppColors.background,
-                        icon: const Icon(Icons.arrow_drop_down, color: AppColors.textSecondary),
+                  child: TextField(
+                    controller: _minPriceController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: 'Min Price',
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black.withOpacity(0.15)),
+                        borderRadius: BorderRadius.circular(12),
                       ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black.withOpacity(0.15)),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      prefixText: 'Rp ',
+                      prefixStyle: TextStyle(color: AppColors.textPrimary),
                     ),
+                    onChanged: (value) => _applyFilters(),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: TextField(
+                    controller: _maxPriceController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: 'Max Price',
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black.withOpacity(0.15)),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black.withOpacity(0.15)),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      prefixText: 'Rp ',
+                      prefixStyle: TextStyle(color: AppColors.textPrimary),
+                    ),
+                    onChanged: (value) => _applyFilters(),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Quantity range filter
+            Row(
+              children: [
                 Expanded(
                   child: TextField(
                     controller: _minQuantityController,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                      labelText: 'Min Qty',
+                      labelText: 'Min Quantity',
                       border: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.black.withOpacity(0.15)),
                         borderRadius: BorderRadius.circular(12),
@@ -252,7 +235,7 @@ class _ProductionPageState extends State<ProductionPage> {
                     controller: _maxQuantityController,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                      labelText: 'Max Qty',
+                      labelText: 'Max Quantity',
                       border: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.black.withOpacity(0.15)),
                         borderRadius: BorderRadius.circular(12),
@@ -261,54 +244,6 @@ class _ProductionPageState extends State<ProductionPage> {
                         borderSide: BorderSide(color: Colors.black.withOpacity(0.15)),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                    ),
-                    onChanged: (value) => _applyFilters(),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-
-            // Value range filter
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _minValueController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      labelText: 'Min Value',
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black.withOpacity(0.15)),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black.withOpacity(0.15)),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      prefixText: 'Rp ',
-                      prefixStyle: TextStyle(color: AppColors.textPrimary),
-                    ),
-                    onChanged: (value) => _applyFilters(),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: TextField(
-                    controller: _maxValueController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      labelText: 'Max Value',
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black.withOpacity(0.15)),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black.withOpacity(0.15)),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      prefixText: 'Rp ',
-                      prefixStyle: TextStyle(color: AppColors.textPrimary),
                     ),
                     onChanged: (value) => _applyFilters(),
                   ),
@@ -346,7 +281,7 @@ class _ProductionPageState extends State<ProductionPage> {
     );
   }
 
-  Widget _buildProductionList() {
+  Widget _buildProductList() {
     final currencyFormat = NumberFormat.currency(
       locale: 'id_ID',
       symbol: 'Rp',
@@ -354,9 +289,9 @@ class _ProductionPageState extends State<ProductionPage> {
     );
 
     return ListView.builder(
-      itemCount: _filteredRecords.length,
+      itemCount: _filteredProducts.length,
       itemBuilder: (context, index) {
-        final record = _filteredRecords[index];
+        final product = _filteredProducts[index];
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
@@ -368,20 +303,18 @@ class _ProductionPageState extends State<ProductionPage> {
               borderRadius: BorderRadius.all(Radius.circular(16)),
             ),
             title: Text(
-              record.product,
+              product.productName,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: AppColors.textPrimary,
               ),
             ),
             subtitle: Text(
-              'Status: ${record.status} • Qty: ${record.quantityProduced}',
-              style: TextStyle(
-                color: _getStatusColor(record.status),
-              ),
+              'SKU: ${product.sku} • Qty: ${product.quantity}',
+              style: TextStyle(color: AppColors.textSecondary),
             ),
             trailing: Text(
-              currencyFormat.format(record.saleValue),
+              currencyFormat.format(product.saleValue),
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: AppColors.textPrimary,
@@ -393,14 +326,12 @@ class _ProductionPageState extends State<ProductionPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildDetailRow('Production ID', record.id),
-                    _buildDetailRow('Status', record.status),
-                    _buildDetailRow('Operator', record.operator),
-                    _buildDetailRow('Quantity Produced', record.quantityProduced.toString()),
-                    _buildDetailRow('Unit Price', currencyFormat.format(record.unitPrice)),
-                    _buildDetailRow('Total Value', currencyFormat.format(record.saleValue)),
-                    _buildDetailRow('Created At', DateFormat('dd MMM yyyy HH:mm').format(record.createdAt)),
-                    _buildDetailRow('Updated At', DateFormat('dd MMM yyyy HH:mm').format(record.updatedAt)),
+                    _buildDetailRow('SKU', product.sku),
+                    _buildDetailRow('Unit Price', currencyFormat.format(product.unitPrice)),
+                    _buildDetailRow('Quantity', product.quantity.toString()),
+                    _buildDetailRow('Total Value', currencyFormat.format(product.saleValue)),
+                    _buildDetailRow('Created At', DateFormat('dd MMM yyyy HH:mm').format(product.createdAt)),
+                    _buildDetailRow('Updated At', DateFormat('dd MMM yyyy HH:mm').format(product.updatedAt)),
                   ],
                 ),
               ),
@@ -418,7 +349,7 @@ class _ProductionPageState extends State<ProductionPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 120,
+            width: 100,
             child: Text(
               label,
               style: TextStyle(
@@ -438,55 +369,37 @@ class _ProductionPageState extends State<ProductionPage> {
       ),
     );
   }
-
-  Color _getStatusColor(String status) {
-    switch (status) {
-      case 'Menunggu':
-        return Colors.orange;
-      case 'Sedang Berlangsung':
-        return Colors.blue;
-      case 'Selesai':
-        return Colors.green;
-      case 'Dibatalkan':
-        return Colors.red;
-      default:
-        return AppColors.textSecondary;
-    }
-  }
 }
 
-class ProductionRecord {
+class Product {
   final String id;
-  final String product;
-  final String status;
-  final int quantityProduced;
+  final String sku;
+  final String productName;
+  final int quantity;
   final int unitPrice;
   final int saleValue;
-  final String operator;
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  ProductionRecord({
+  Product({
     required this.id,
-    required this.product,
-    required this.status,
-    required this.quantityProduced,
+    required this.sku,
+    required this.productName,
+    required this.quantity,
     required this.unitPrice,
     required this.saleValue,
-    required this.operator,
     required this.createdAt,
     required this.updatedAt,
   });
 
-  factory ProductionRecord.fromJson(Map<String, dynamic> json) {
-    return ProductionRecord(
+  factory Product.fromJson(Map<String, dynamic> json) {
+    return Product(
       id: json['_id'],
-      product: json['product'],
-      status: json['status'],
-      quantityProduced: json['quantityProduced'],
+      sku: json['sku'],
+      productName: json['productName'],
+      quantity: json['quantity'],
       unitPrice: json['unitPrice'],
       saleValue: json['saleValue'],
-      operator: json['operator'],
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
     );

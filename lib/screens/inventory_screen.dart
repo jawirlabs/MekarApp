@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mekarjs/core/theme/colors.dart';
 
-class InventoryPage extends StatefulWidget {
-  const InventoryPage({super.key});
+class InventoryScreen extends StatefulWidget {
+  const InventoryScreen({super.key});
 
   @override
-  State<InventoryPage> createState() => _InventoryPageState();
+  State<InventoryScreen> createState() => _InventoryScreenState();
 }
 
-class _InventoryPageState extends State<InventoryPage> {
+class _InventoryScreenState extends State<InventoryScreen> {
   final Dio _dio = Dio();
   final String _apiUrl = 'https://mekarjs-api.vercel.app/api/inventory';
   
@@ -96,6 +96,7 @@ class _InventoryPageState extends State<InventoryPage> {
     return Scaffold(
       body: Column(
         children: [
+          const SizedBox(height: 32),
           _buildFilterSection(),
           Expanded(
             child: _isLoading

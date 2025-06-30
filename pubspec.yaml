@@ -42,6 +42,9 @@ dependencies:
   http: ^1.4.0
   shared_preferences: ^2.5.3
   flutter_svg: ^2.1.0
+  fl_chart: ^1.0.0
+  material_symbols_icons: ^4.2815.1
+  lucide_icons: ^0.257.0
 
 flutter_icons:
   android: true

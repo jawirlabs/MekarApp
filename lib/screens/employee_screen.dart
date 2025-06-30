@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mekarjs/core/theme/colors.dart';
 
-class EmployeePage extends StatefulWidget {
-  const EmployeePage({super.key});
+class EmployeeScreen extends StatefulWidget {
+  const EmployeeScreen({super.key});
 
   @override
-  State<EmployeePage> createState() => _EmployeePageState();
+  State<EmployeeScreen> createState() => _EmployeeScreenState();
 }
 
-class _EmployeePageState extends State<EmployeePage> {
+class _EmployeeScreenState extends State<EmployeeScreen> {
   final Dio _dio = Dio();
   final String _apiUrl = 'https://mekarjs-api.vercel.app/api/employee';
   
@@ -110,6 +110,7 @@ class _EmployeePageState extends State<EmployeePage> {
     return Scaffold(
       body: Column(
         children: [
+          const SizedBox(height: 32),
           _buildFilterSection(),
           Expanded(
             child: _isLoading
